@@ -1,0 +1,23 @@
+{
+  "name": "raspberry-toys",
+  "version": "0.0.0",
+  "description": "vforge's Raspberry Pi: Toys and Tools",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vforge/raspberry-toys.git"
+  },
+  "author": "Bartosz V. Bentkowski <me@bartoszbentkowski.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/vforge/raspberry-toys/issues"
+  },
+  "homepage": "https://github.com/vforge/raspberry-toys#readme",
+  "dependencies": {
+    "johnny-five": "^1.0.0",
+    "raspi-io": "^9.0.1"
+  }
+}
