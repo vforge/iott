@@ -8,7 +8,7 @@ const board = new five.Board({
 });
 
 // Run Board 
-board.on('ready', () => { 
+board.on('ready', function () { 
   // LED Pin variable 
   const led = new five.Led('P1-7'); 
   led.on(); 
