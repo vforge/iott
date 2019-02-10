@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Sources:
+# - https://www.maketecheasier.com/finding-raspberry-pi-system-information/
+#
+
 
 # echo "> CPU"
 # cat /proc/cpuinfo
