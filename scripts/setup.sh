@@ -1,3 +1,9 @@
 #!/bin/bash
-sudo apt-get install update
-sudo apt-get install upgrade
+echo "> Update"
+sudo apt-get update
+
+echo "> Upgrade"
+sudo apt-get upgrade
+
+echo "> Installing essentials"
+sudo apt-get install glances

@@ -1,5 +1,11 @@
 # IoT Tools
 
+# Basic install
+
+```bash
+$> curl -sL https://raw.githubusercontent.com/vforge/iott/master/scripts/setup.sh | bash
+```
+
 # Installing node
 
 ```bash
