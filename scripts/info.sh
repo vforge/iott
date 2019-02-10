@@ -25,4 +25,4 @@ echo -e "$codec:\t$(vcgencmd codec_enabled $codec)" ; \
 done
 
 echo "> Free memory"
-free -o -h
+free -h
