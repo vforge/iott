@@ -1,0 +1,226 @@
+<head>
+  <script>
+    // requestAnim shim layer by Paul Irish
+    window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       || 
+              window.webkitRequestAnimationFrame || 
+              window.mozRequestAnimationFrame    || 
+              window.oRequestAnimationFrame      || 
+              window.msRequestAnimationFrame     || 
+      function(/* function */ callback, /* DOMElement */ element) {
+        window.setTimeout(callback, 1000 / 60);
+      };
+    })();
+    
+    function drawFrame(context, plasmaMap, colorMap) {
+      var time = new Date().getTime() * 0.003;
+      
+      var w = context.canvas.width;
+      var h = context.canvas.height;
+      var imageData = context.getImageData(0, 0, w, h);
+      var px = imageData.data;
+      
+      var kx = w/h;
+      for(var y=0; y < h; y++) {
+        var yy = y/h-.5;
+        for(var x=0; x < w; x++) {
+          var xx = kx*x/w-kx/2;
+          var v = plasmaMap(xx, yy, time);
+          colorMap(px, (y*w+x)*4, v);
+        }
+      }
+      context.putImageData(imageData, 0, 0);
+    }
+    
+    function drawStill(canvasId, plasmaMap, colorMap) {
+      var canvas = document.getElementById(canvasId);
+      var context = canvas.getContext( '2d' );
+      drawFrame(context, plasmaMap, colorMap);
+    }
+    
+    function drawAnimated(canvasId, plasmaMap, colorMap) {
+      var canvas = document.getElementById(canvasId);
+      var context = canvas.getContext( '2d' );
+      
+      function animate() {
+        drawFrame(context, plasmaMap, colorMap);
+        requestAnimFrame( animate );
+      }
+      requestAnimFrame( animate );
+    }
+    
+    function plasmaFinal(x, y, time) {
+      var v = 0;
+      v += Math.sin((x*10+time));
+      v += Math.sin((y*10+time)/2.0);
+      v += Math.sin((x*10+y*10+time)/2.0);
+      var cx = x + .5 * Math.sin(time/5.0);
+      var cy = y + .5 * Math.cos(time/3.0);
+      v += Math.sin(Math.sqrt(100*(cx*cx+cy*cy)+1)+time);
+      v = v/2.0;
+      return v;
+    }
+    
+    function colorMap1(px, offset, v) {
+      px[offset  ] = 255*(.5+.5*Math.sin(Math.PI*v));
+      px[offset+1] = 255*(.5+.5*Math.cos(Math.PI*v));
+      px[offset+2] = 0;
+      px[offset+3] = 255;
+    }
+    
+    function colorMap2(px, offset, v) {
+      px[offset  ] = 255;
+      px[offset+1] = 255*(.5+.5*Math.cos(Math.PI*v));
+      px[offset+2] = 255*(.5+.5*Math.sin(Math.PI*v));
+      px[offset+3] = 255;
+    }
+    
+    function colorMap3(px, offset, v) {
+      px[offset  ] = 255*(.5+.5*Math.sin(Math.PI*v));
+      px[offset+1] = 255*(.5+.5*Math.sin(Math.PI*v+2*Math.PI/3));
+      px[offset+2] = 255*(.5+.5*Math.sin(Math.PI*v+4*Math.PI/3));
+      px[offset+3] = 255;
+    }
+    
+    function colorMap4(px, offset, v) {
+      var c = .5+.5*Math.sin(Math.PI*v*5);
+      px[offset  ] = 255*c;
+      px[offset+1] = 255*c;
+      px[offset+2] = 255*c;
+      px[offset+3] = 255;
+    }
+    
+    function colorMapGrey(px, offset, v) {
+      var c = 255*(.5+.5*v*.8);
+      px[offset  ] = c;
+      px[offset+1] = c;
+      px[offset+2] = c;
+      px[offset+3] = 255;
+    }
+  </script>
+</head>
+<body>
+  <a id="1"><h2>Intro</h2></a>
+  <canvas id="plasma0" width="150" height="50" style="width: 450px; height: 150px; float: right; padding: 0 10pt 0 10pt;"></canvas>
+  
+  <p>I recently had to write an intro screen for an Android app I'm working on. I decided to go old school and use some plasma. This article is the result of my investigations into recreating this well-known effect. Let's not build unnecessary suspense, here's what the final result looks like:</p>
+  <div style="clear:both;"></div>
+  <script>
+    drawAnimated("plasma0", plasmaFinal, colorMap1);
+  </script>
+  
+  <a id="2"><h2>Building the plasma</h2></a>
+  <p>The plasma is basically a function on 2D space created by adding together a few sinusoids. By combining different types of sines and adding a time component the illusion of motion is achieved. Below are some examples of different types of sinusoids that we can use, and an illustration with and without the time component:</p>
+  <table>
+  <tbody><tr>
+  <td>
+  <p>The first sinusoid is simply taken along the x-axis. The coordinates of the squares on the right go from -0.5 to 0.5 in x and y.</p>
+  <p>Formula: <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=v+%3D+%5Csin%28x%2A10%2Btime%29"></p>
+  </td>
+  <td><canvas id="plasma1" width="20" height="20" style="width: 100px; height: 100px"></canvas></td>
+  <td><canvas id="plasma1d" width="20" height="20" style="width: 100px; height: 100px"></canvas></td>
+  </tr>
+  <tr>
+  <td><p>Obviously it is also possible to take another sinusoid along the y-axis, or in a diagonal, or at any angle, and to make the angle change with time. Here's what it looks like.</p>
+  <p>Formula: <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=v+%3D+%5Csin%2810%2A%28x%2A%5Csin%28time%2F2%29%2By%2A%5Ccos%28time%2F3%29%29%2Btime%29"></p>
+  </td>
+  <td><canvas id="plasma2" width="20" height="20" style="width: 100px; height: 100px"></canvas></td>
+  <td><canvas id="plasma2d" width="20" height="20" style="width: 100px; height: 100px"></canvas></td>
+  </tr>
+  <tr>
+  <td><p>The last type of sinusoid we can use is a concentric sinusoid starting from a point, here we can also animate it and move the center point around  in a Lissajous figure:</p>
+  <p>&nbsp;
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=cx+%3D+x+%2B+.5+%2A+%5Csin%28time%2F5%29+%5C%5C%0A++++++++++++cy+%3D+y+%2B+.5+%2A+%5Ccos%28time%2F3%29+%5C%5C%0A++++++++++++v+%3D+%5Csin%28%5Csqrt%7B100%2A%28cx%5E2%2Bcy%5E2%29%2B1%7D%2Btime%29">
+  </p>
+  <p>I'm adding 1 to the square root term to avoid a visible dot at the center when it "folds" at zero.</p></td>
+  <td><canvas id="plasma3" width="20" height="20" style="width: 100px; height: 100px"></canvas></td>
+  <td><canvas id="plasma3d" width="20" height="20" style="width: 100px; height: 100px"></canvas></td>
+  </tr>
+  <tr>
+  <td>
+  <p>We can then mix and match these functions and hopefully we get a nice plasma effect. Here I'm simply adding the 3 together.</p>
+  </td>
+  <td><canvas id="plasma4" width="20" height="20" style="width: 100px; height: 100px"></canvas></td>
+  <td><canvas id="plasma4d" width="20" height="20" style="width: 100px; height: 100px"></canvas></td>
+  </tr>
+  </tbody></table>
+  
+  <script>
+  drawStill("plasma1", function(x, y, time) { return Math.sin((x*10)); }, colorMapGrey);
+  drawStill("plasma2", function(x, y, time) { return Math.sin(10*(x+y)); }, colorMapGrey);
+  drawStill("plasma3", function(x, y, time) { return Math.sin(Math.sqrt(100*(x*x+y*y)+1)); }, colorMapGrey);
+  drawStill("plasma4", function(x, y, time) { 
+    var v = Math.sin((x*10));
+    v += Math.sin(10*(x+y));
+    v += Math.sin(Math.sqrt(100*(x*x+y*y)+1));
+    return v/2;
+  }, colorMapGrey);
+  
+  drawAnimated("plasma1d", function(x, y, time) { return Math.sin((x*10+time)); }, colorMapGrey);
+  drawAnimated("plasma2d", function(x, y, time) { return Math.sin(10*(x*Math.sin(time/2)+y*Math.cos(time/3))+time); }, colorMapGrey);
+  drawAnimated("plasma3d", function(x, y, time) { 
+    var cx = x + .5 * Math.sin(time/5.0);
+    var cy = y + .5 * Math.cos(time/3.0);
+    return Math.sin(Math.sqrt(100*(cx*cx+cy*cy)+1)+time);
+  }, colorMapGrey);
+  drawAnimated("plasma4d", function(x, y, time) { 
+    var v = Math.sin((x*10+time));
+    v += Math.sin(10*(x*Math.sin(time/2)+y*Math.cos(time/3))+time);
+    var cx = x + .5 * Math.sin(time/5.0);
+    var cy = y + .5 * Math.cos(time/3.0);
+    v += Math.sin(Math.sqrt(100*(cx*cx+cy*cy)+1)+time);
+    return v/2;
+  }, colorMapGrey);
+  
+  </script>
+  
+  <a id="3"><h2>Adding color</h2></a>
+  <p>Now we've got something pretty cool looking, but obviously it's not as good as the one you saw in that demo at Assembly '92. Time to add some color.</p>
+  <p>To preserve the organic, fluid look of the plasma, the color scheme should not have discontinuities. However after adding our sines together, the plasma value is not necessarily constrained in a nice known interval like [0, 1]. An easy way to solve this problem is to take the sinus again of the value we obtained at the end of our plasma function, and use it to create the RGB components of the color. In the examples below r, g and b are the red, green and blue components of the color, with -1 being the lowest intensity (black), and 1 the highest (fully saturated color component).</p>
+  
+  <table>
+  <tbody><tr>
+  <td>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=r+%3D+%5Csin%28v%2A%5Cpi%29"><br>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=g+%3D+%5Ccos%28v%2A%5Cpi%29"><br>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=b+%3D+0"><br>
+  </td>
+  <td>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=r+%3D+1"><br>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=g+%3D+%5Ccos%28v%2A%5Cpi%29"><br>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=b+%3D+%5Csin%28v%2A%5Cpi%29"><br>
+  </td>
+  <td>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=r+%3D+%5Csin%28v%2A%5Cpi%29"><br>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=g+%3D+%5Csin%28v%2A%5Cpi%2B2%2A%5Cpi%2F3%29"><br>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=b+%3D+%5Csin%28v%2A%5Cpi%2B4%2A%5Cpi%2F3%29"><br>
+  </td>
+  <td>
+  <img src="http://chart.apis.google.com/chart?cht=tx&amp;chf=bg,s,FF000000&amp;chl=r+%3D+g+%3D+b+%3D+%5Csin%28v%2A5%2A%5Cpi%29">
+  </td>
+  </tr>
+  <tr>
+  <td><canvas id="palette1" width="20" height="20" style="width: 200px; height: 20px"></canvas></td>
+  <td><canvas id="palette2" width="20" height="20" style="width: 200px; height: 20px"></canvas></td>
+  <td><canvas id="palette3" width="20" height="20" style="width: 200px; height: 20px"></canvas></td>
+  <td><canvas id="palette4" width="20" height="20" style="width: 200px; height: 20px"></canvas></td>
+  </tr>
+  <tr>
+  <td><canvas id="plasmaP1" width="50" height="50" style="width: 200px; height: 200px"></canvas></td>
+  <td><canvas id="plasmaP2" width="50" height="50" style="width: 200px; height: 200px"></canvas></td>
+  <td><canvas id="plasmaP3" width="50" height="50" style="width: 200px; height: 200px"></canvas></td>
+  <td><canvas id="plasmaP4" width="100" height="100" style="width: 200px; height: 200px"></canvas></td>
+  </tr>
+  </tbody></table>
+  <script>
+  drawStill("palette1", function(x, y, time) { return 2*x; }, colorMap1);
+  drawStill("palette2", function(x, y, time) { return 2*x; }, colorMap2);
+  drawStill("palette3", function(x, y, time) { return 2*x; }, colorMap3);
+  drawStill("palette4", function(x, y, time) { return 2*x; }, colorMap4);
+  drawAnimated("plasmaP1", plasmaFinal, colorMap1);
+  drawAnimated("plasmaP2", plasmaFinal, colorMap2);
+  drawAnimated("plasmaP3", plasmaFinal, colorMap3);
+  drawAnimated("plasmaP4", plasmaFinal, colorMap4);
+  </script>
+  <p><a href="https://www.bidouille.org/prog/plasma">https://www.bidouille.org/prog/plasma</a></p>
+</body>
