@@ -1,15 +1,13 @@
 #!/bin/bash
-echo "> Update"
-sudo apt-get update
 
-echo "> Upgrade"
+sudo apt-get update
 sudo apt-get upgrade
 
-echo "> Installing essentials"
-sudo apt-get -y install glances git
+sudo apt-get -y install glances git build-essential \
+  python-dev python-pip python3-pip \
+  pimoroni python3-blinkt python-blinkt
 
-echo "> Installing Python"
-sudo apt-get -y install build-essential python-dev python-pip
-
-echo "> Installing Python: GPIO"
-sudo pip install RPi.GPIO
+sudo pip install RPi.GPIO requests
+sudo pip3 install adafruit-circuitpython-ssd1306
+sudo pip3 install RPI.GPIO
+sudo pip3 install adafruit-blinka

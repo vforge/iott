@@ -12,6 +12,7 @@ $> sudo raspi-config
 - Enable VNC
 - Enable WIFI
 - Enable i2c
+- Enable SPI
 
 ### Renaming host
 
