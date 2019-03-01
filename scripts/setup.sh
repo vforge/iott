@@ -9,6 +9,7 @@ sudo apt-get -y update
 sudo apt-get -y upgrade
 
 sudo apt-get -y install glances git build-essential \
+  i2c-tools libi2c-dev \
   python-dev python-pip python3-pip \
   python-smbus python3-smbus \
   python-numpy python3-numpy \
