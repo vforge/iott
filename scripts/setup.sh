@@ -19,9 +19,9 @@ sudo apt-get -y install glances git build-essential \
   python-blinkt python3-blinkt pimoroni \
   python-scrollphathd python3-scrollphathd \
 
-# # sudo pip install RPi.GPIO requests
-# # sudo pip3 install adafruit-circuitpython-ssd1306
-# # sudo pip3 install RPI.GPIO
-# # sudo pip3 install adafruit-blinka
+sudo pip install RPi.GPIO requests
+sudo pip3 install adafruit-circuitpython-ssd1306
+sudo pip3 install RPI.GPIO requests
+sudo pip3 install adafruit-blinka
 
 # # curl https://get.pimoroni.com/scrollphathd | bash
