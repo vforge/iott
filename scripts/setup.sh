@@ -1,9 +1,5 @@
 # #!/bin/bash
 
-# # sudo nano /etc/hostname
-# # sudo nano /etc/hosts
-# # dpkg-reconfigure tzdata
-
 echo "> UPDATE"
 sudo apt-get -y update
 

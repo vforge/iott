@@ -20,6 +20,10 @@ $> sudo raspi-config
 $> sudo nano /etc/hostname
 ```
 
+```bash
+$> sudo nano /etc/hosts
+```
+
 ## Basic setup
 
 ```bash
